@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>DNS Resolution Checker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <span class="logo">◆</span>
+    <div>
+      <div class="brand-name">DNS Checker</div>
+      <div class="brand-sub">Private domain monitor</div>
+    </div>
+  </div>
+  <nav>
+    <a class="nav-link active" data-section="dashboard">Dashboard</a>
+    <a class="nav-link" data-section="watchlist">Watchlist</a>
+    <a class="nav-link" data-section="analysis">Analysis</a>
+  </nav>
+  <div class="sidebar-foot">Flask · v1.0</div>
+</aside>
+
+<main class="content">
+  <div id="toast" class="toast"></div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="sec-dashboard" class="section active">
+    <header class="page-head">
+      <h1>Dashboard</h1>
+      <button id="checkAllBtn" class="btn">Check all</button>
+    </header>
+
+    <div class="hero card">
+      <div>
+        <div class="label">Overall success rate</div>
+        <div id="rate" class="big amber">—</div>
+        <div id="rateSub" class="muted">No checks yet</div>
+      </div>
+      <div class="leds">
+        <div class="led-wrap">
+          <div id="ledOk" class="led"></div>
+          <span>Success LED</span>
+        </div>
+        <div class="led-wrap">
+          <div id="ledFail" class="led"></div>
+          <span>Fail LED</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="card stat"><div class="label">Total checks</div><div id="total" class="big">0</div></div>
+      <div class="card stat"><div class="label">Resolved</div><div id="okCount" class="big ok">0</div></div>
+      <div class="card stat"><div class="label">Failed</div><div id="failCount" class="big fail">0</div></div>
+      <div class="card stat"><div class="label">Avg latency</div><div id="avgLat" class="big">—</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Resolve a domain</h3>
+        <div class="form-row">
+          <input id="domainInput" placeholder="e.g. router.lan" autocomplete="off">
+          <button id="resolveBtn" class="btn">Resolve</button>
+        </div>
+        <div class="hint">Press Enter or click Resolve. Uses your system DNS, so router and Pi-hole names work.</div>
+
+        <div class="last">
+          <div class="label">Last result</div>
+          <div id="status" class="status-text muted">READY</div>
+          <div id="lastIp" class="mono muted">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Watchlist</h3>
+          <button class="btn ghost small" data-goto="watchlist">Manage</button>
+        </div>
+        <table>
+          <thead><tr><th>Domain</th><th></th></tr></thead>
+          <tbody id="watchRowsDash"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Recent checks</h3>
+        <button id="clearBtn" class="btn ghost small">Clear history</button>
+      </div>
+      <table>
+        <thead><tr><th>Time</th><th>Domain</th><th>Resolved IP</th><th>Latency</th><th>Result</th></tr></thead>
+        <tbody id="historyRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ WATCHLIST ============ -->
+  <section id="sec-watchlist" class="section">
+    <header class="page-head"><h1>Watchlist</h1></header>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Add a domain</h3>
+        <div class="form-row">
+          <input id="newDomain" placeholder="e.g. nas.home.lan" autocomplete="off">
+          <button id="addBtn" class="btn">Add</button>
+        </div>
+        <div class="hint">Each domain is checked when you press Check or Check all.</div>
+      </div>
+
+      <div class="card">
+        <h3>Saved domains</h3>
+        <table>
+          <thead><tr><th>Domain</th><th></th></tr></thead>
+          <tbody id="watchRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANALYSIS ============ -->
+  <section id="sec-analysis" class="section">
+    <header class="page-head"><h1>Analysis</h1></header>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Success vs failure per domain</h3>
+        <div id="analysisBars"></div>
+      </div>
+      <div class="card">
+        <h3>Latency per domain</h3>
+        <table>
+          <thead><tr><th>Domain</th><th>Checks</th><th>Avg latency</th></tr></thead>
+          <tbody id="latencyRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
